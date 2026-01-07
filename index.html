@@ -14,27 +14,43 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .product-card img { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .product-card:hover img { transform: scale(1.08); }
+        @media (hover: hover) {
+            .product-card:hover img { transform: scale(1.08); }
+        }
         
-        .cart-sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .cart-open { transform: translateX(0) !important; }
+        .cart-sidebar, .mobile-menu { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-open { transform: translateX(0) !important; }
         
         .badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .modal-bg { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none; }
+        
+        .modal-bg { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none !important; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-active { display: flex !important; opacity: 1; }
+
+        /* Custom scrollbar for desktop */
+        @media (min-width: 1024px) {
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-track { background: #f1f1f1; }
+            ::-webkit-scrollbar-thumb { background: #1a1a1a; }
+        }
     </style>
 </head>
 <body class="page-transition">
 
-    <div class="bg-black text-white text-[11px] py-2 text-center font-bold tracking-[0.2em] uppercase">
-        Best E-Commerce Website
+    <div class="bg-black text-white text-[10px] md:text-[11px] py-2 text-center font-bold tracking-[0.2em] uppercase px-4">
+        Free Shipping on all orders over $150
     </div>
 
-    <nav class="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 lg:px-12 py-5 flex items-center justify-between">
-        <div class="flex items-center gap-12">
-            <div class="text-2xl font-black tracking-tighter text-red-600 cursor-pointer flex items-center" onclick="window.location.reload()">
-                <i class="fa-solid fa-mountain-sun mr-2"></i> E-Commerce Website
+    <nav class="sticky top-0 z-[100] bg-white/90 backdrop-blur-md border-b border-gray-100 px-4 md:px-12 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4 lg:gap-12">
+            <button class="lg:hidden text-xl" onclick="toggleMobileMenu(true)">
+                <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+
+            <div class="text-xl md:text-2xl font-black tracking-tighter text-red-600 cursor-pointer flex items-center" onclick="window.location.reload()">
+                <i class="fa-solid fa-mountain-sun mr-2"></i> STORM
             </div>
+            
             <ul class="hidden lg:flex gap-8 text-[13px] font-bold uppercase tracking-widest text-gray-600">
                 <li class="hover:text-red-600 cursor-pointer transition" onclick="renderProducts(products, 'Shop All')">Shop All</li>
                 <li class="hover:text-red-600 cursor-pointer transition" onclick="filterByBadge('New')">New Arrivals</li>
@@ -42,9 +58,9 @@
             </ul>
         </div>
 
-        <div class="flex items-center gap-6 text-gray-800">
-            <div class="relative hidden md:flex items-center">
-                <input type="text" id="productSearch" onkeyup="handleSearch()" placeholder="Search products..." class="border-b border-gray-300 py-1 px-2 text-sm focus:outline-none focus:border-red-600 transition-all w-48">
+        <div class="flex items-center gap-4 md:gap-6 text-gray-800">
+            <div class="relative hidden sm:flex items-center">
+                <input type="text" id="productSearch" onkeyup="handleSearch()" placeholder="Search..." class="border-b border-gray-300 py-1 px-2 text-sm focus:outline-none focus:border-red-600 transition-all w-32 md:w-48 bg-transparent">
                 <i class="fa-solid fa-magnifying-glass text-sm absolute right-2"></i>
             </div>
             <i class="fa-regular fa-user text-xl cursor-pointer hover:text-red-600 transition" onclick="toggleAuthModal(true)"></i>
@@ -55,165 +71,167 @@
         </div>
     </nav>
 
-    <header id="hero-section" class="relative h-[80vh] bg-gray-100 flex items-center overflow-hidden">
+    <div id="mobileMenu" class="fixed inset-y-0 left-0 w-full max-w-xs bg-white shadow-2xl z-[200] mobile-menu transform -translate-x-full flex flex-col">
+        <div class="p-6 border-b flex justify-between items-center">
+            <span class="font-black tracking-tighter text-red-600">MENU</span>
+            <button onclick="toggleMobileMenu(false)" class="text-2xl">&times;</button>
+        </div>
+        <div class="p-8 space-y-6 font-bold uppercase tracking-widest text-sm text-gray-700">
+            <p onclick="renderProducts(products, 'Shop All'); toggleMobileMenu(false)">Shop All</p>
+            <p onclick="filterByBadge('New'); toggleMobileMenu(false)">New Arrivals</p>
+            <p onclick="filterByBadge('Premium'); toggleMobileMenu(false)">Collections</p>
+            <div class="pt-6 border-t border-gray-100">
+                <p class="text-[10px] text-gray-400 mb-4">Categories</p>
+                <p class="mb-4" onclick="filterByCat('Electronics'); toggleMobileMenu(false)">Electronics</p>
+                <p class="mb-4" onclick="filterByCat('Apparel'); toggleMobileMenu(false)">Apparel</p>
+            </div>
+        </div>
+    </div>
+
+    <header id="hero-section" class="relative h-[70vh] md:h-[80vh] bg-gray-100 flex items-center overflow-hidden">
         <div class="absolute inset-0 z-0">
             <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600" class="w-full h-full object-cover">
         </div>
         <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full">
-            <div class="max-w-xl bg-white/10 backdrop-blur-md p-10 rounded-sm border border-white/20">
-                <span class="text-red-600 font-black uppercase tracking-[0.3em] text-xs mb-4 block">Spring 2026 Collection</span>
-                <h1 class="text-6xl font-black tracking-tighter leading-none mb-6">BUILT FOR <br>THE ELEMENTS.</h1>
-                <p class="text-lg text-gray-800 mb-8 font-medium">Explore high-performance gear designed for the modern explorer.</p>
-                <div class="flex gap-4">
-                    <button onclick="renderProducts(products, 'All Gear')" class="bg-black text-white px-10 py-4 font-bold uppercase tracking-widest hover:bg-red-600 transition shadow-xl">Shop Gear</button>
-                   
+            <div class="max-w-xl bg-white/20 backdrop-blur-lg p-6 md:p-10 rounded-sm border border-white/30">
+                <span class="text-red-600 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs mb-4 block">Spring 2026 Collection</span>
+                <h1 class="text-4xl md:text-6xl font-black tracking-tighter leading-none mb-6">BUILT FOR <br>THE ELEMENTS.</h1>
+                <p class="text-base md:text-lg text-gray-900 mb-8 font-medium">High-performance gear for the modern explorer.</p>
+                <button onclick="renderProducts(products, 'All Gear')" class="bg-black text-white px-8 md:px-10 py-3 md:py-4 font-bold uppercase tracking-widest hover:bg-red-600 transition shadow-xl w-full md:w-auto">Shop Gear</button>
             </div>
         </div>
     </header>
 
-    <section class="py-12 border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-6 flex justify-center gap-10 overflow-x-auto hide-scrollbar">
-            <div class="flex flex-col items-center gap-3 cursor-pointer group" onclick="filterByCat('Electronics')">
-                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition"><i class="fa-solid fa-laptop text-2xl"></i></div>
-                <span class="text-xs font-bold uppercase tracking-widest">Electronics</span>
+    <section class="py-8 md:py-12 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between lg:justify-center gap-6 md:gap-10 overflow-x-auto hide-scrollbar">
+            <div class="flex flex-col items-center gap-3 cursor-pointer group min-w-[80px]" onclick="filterByCat('Electronics')">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition"><i class="fa-solid fa-laptop text-xl md:text-2xl"></i></div>
+                <span class="text-[10px] font-bold uppercase tracking-widest">Tech</span>
             </div>
-            <div class="flex flex-col items-center gap-3 cursor-pointer group" onclick="filterByCat('Apparel')">
-                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition"><i class="fa-solid fa-shirt text-2xl"></i></div>
-                <span class="text-xs font-bold uppercase tracking-widest">Apparel</span>
+            <div class="flex flex-col items-center gap-3 cursor-pointer group min-w-[80px]" onclick="filterByCat('Apparel')">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition"><i class="fa-solid fa-shirt text-xl md:text-2xl"></i></div>
+                <span class="text-[10px] font-bold uppercase tracking-widest">Apparel</span>
             </div>
-            <div class="flex flex-col items-center gap-3 cursor-pointer group" onclick="filterByCat('Furniture')">
-                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition"><i class="fa-solid fa-couch text-2xl"></i></div>
-                <span class="text-xs font-bold uppercase tracking-widest">Furniture</span>
+            <div class="flex flex-col items-center gap-3 cursor-pointer group min-w-[80px]" onclick="filterByCat('Furniture')">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition"><i class="fa-solid fa-couch text-xl md:text-2xl"></i></div>
+                <span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
             </div>
-            <div class="flex flex-col items-center gap-3 cursor-pointer group" onclick="filterByCat('Footwear')">
-                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition"><i class="fa-solid fa-shoe-prints text-2xl"></i></div>
-                <span class="text-xs font-bold uppercase tracking-widest">Footwear</span>
+            <div class="flex flex-col items-center gap-3 cursor-pointer group min-w-[80px]" onclick="filterByCat('Footwear')">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-red-50 transition"><i class="fa-solid fa-shoe-prints text-xl md:text-2xl"></i></div>
+                <span class="text-[10px] font-bold uppercase tracking-widest">Shoes</span>
             </div>
         </div>
     </section>
 
-    <main id="main-content-area" class="max-w-7xl mx-auto py-20 px-6 lg:px-12">
-        <div class="flex justify-between items-end mb-12">
+    <main id="main-content-area" class="max-w-7xl mx-auto py-12 md:py-20 px-4 md:px-12">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
-                <h2 id="section-title" class="text-3xl font-black tracking-tighter uppercase">Featured Products</h2>
+                <h2 id="section-title" class="text-2xl md:text-3xl font-black tracking-tighter uppercase">Featured Products</h2>
                 <div class="h-1 w-20 bg-red-600 mt-2"></div>
             </div>
-            <button onclick="renderProducts(products, 'All Products')" class="text-sm font-bold border-b-2 border-black pb-1 hover:text-red-600 hover:border-red-600 transition">View All Products</button>
+            <button onclick="renderProducts(products, 'All Products')" class="text-xs font-bold border-b-2 border-black pb-1 hover:text-red-600 hover:border-red-600 transition">View All Products</button>
         </div>
-        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12"></div>
+        <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12"></div>
     </main>
 
-    <section class="bg-black py-20">
+    <section class="bg-black py-16 md:py-24">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div class="order-2 md:order-1">
-                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800" class="rounded-lg shadow-2xl">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800" class="rounded-lg shadow-2xl w-full">
             </div>
             <div class="text-white order-1 md:order-2">
-                <span class="text-red-600 font-bold uppercase tracking-widest text-sm">Engineered Precision</span>
-                <h2 class="text-5xl font-black mt-4 mb-6 leading-tight">THE STORM WATCH <br>S-SERIES</h2>
-                <p class="text-gray-400 mb-8 leading-relaxed">Waterproof up to 50m, 14-day battery life, and aerospace-grade titanium casing.</p>
-                <button onclick="filterByCat('Electronics')" class="bg-white text-black px-10 py-4 font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition">Explore the Series</button>
+                <span class="text-red-600 font-bold uppercase tracking-widest text-xs">Engineered Precision</span>
+                <h2 class="text-4xl md:text-5xl font-black mt-4 mb-6 leading-tight">THE STORM WATCH <br>S-SERIES</h2>
+                <p class="text-gray-400 mb-8 leading-relaxed text-sm md:text-base">Waterproof up to 50m, 14-day battery life, and aerospace-grade titanium casing.</p>
+                <button onclick="filterByCat('Electronics')" class="bg-white text-black px-10 py-4 font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition w-full md:w-auto">Explore Series</button>
             </div>
         </div>
     </section>
 
-    <footer class="bg-white pt-20 pb-10 border-t border-gray-100">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div>
-                <div class="text-xl font-black tracking-tighter text-red-600 mb-6 cursor-pointer" onclick="window.location.reload()">STORM CREEK</div>
-                <p class="text-gray-500 text-sm leading-relaxed">Providing high-performance tools for your daily expedition since 2018.</p>
+    <footer class="bg-white pt-16 pb-10 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 text-center md:text-left">
+            <div class="flex flex-col items-center md:items-start">
+                <div class="text-xl font-black tracking-tighter text-red-600 mb-4">STORM CREEK</div>
+                <p class="text-gray-500 text-xs leading-relaxed max-w-xs">Providing high-performance tools for your daily expedition since 2018.</p>
             </div>
             <div>
-                <h4 class="font-bold text-xs uppercase tracking-[0.2em] mb-6">Shop</h4>
-                <ul class="text-gray-500 text-sm space-y-3">
-                    <li class="hover:text-red-600 cursor-pointer transition" onclick="renderProducts(products, 'All Products')">All Products</li>
-                    <li class="hover:text-red-600 cursor-pointer transition" onclick="filterByBadge('Premium')">Collections</li>
-                    <li class="hover:text-red-600 cursor-pointer transition">Gift Cards</li>
+                <h4 class="font-bold text-[10px] uppercase tracking-[0.2em] mb-6">Support</h4>
+                <ul class="text-gray-500 text-xs space-y-3">
+                    <li class="hover:text-red-600 cursor-pointer transition">Shipping Policy</li>
+                    <li class="hover:text-red-600 cursor-pointer transition">Contact Us</li>
                 </ul>
             </div>
-            <div>
-                <h4 class="font-bold text-xs uppercase tracking-[0.2em] mb-6">Support</h4>
-                <ul class="text-gray-500 text-sm space-y-3">
-                    <li class="hover:text-red-600 cursor-pointer transition" onclick="showInfoPage('shipping')">Shipping Policy</li>
-                    <li class="hover:text-red-600 cursor-pointer transition" onclick="showInfoPage('returns')">Returns & Exchanges</li>
-                    <li class="hover:text-red-600 cursor-pointer transition" onclick="showInfoPage('contact')">Contact Us</li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold text-xs uppercase tracking-[0.2em] mb-6">Newsletter</h4>
-                <p class="text-gray-500 text-sm mb-4">Join for early access to drops.</p>
-                <div class="flex gap-2">
-                    <input type="email" placeholder="Email" class="bg-gray-50 border border-gray-200 px-4 py-2 w-full text-sm focus:outline-none focus:border-black">
-                    <button class="bg-black text-white px-4 py-2 text-xs font-bold uppercase">Join</button>
+            <div class="sm:col-span-2">
+                <h4 class="font-bold text-[10px] uppercase tracking-[0.2em] mb-6">Join the Tribe</h4>
+                <div class="flex gap-2 max-w-sm mx-auto md:mx-0">
+                    <input type="email" placeholder="Email" class="bg-gray-50 border border-gray-200 px-4 py-2 w-full text-xs focus:outline-none focus:border-black">
+                    <button class="bg-black text-white px-6 py-2 text-xs font-bold uppercase">Join</button>
                 </div>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto px-6 mt-20 pt-8 border-t border-gray-100 text-center text-xs text-gray-400 font-bold uppercase tracking-widest">
+        <div class="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-gray-100 text-center text-[10px] text-gray-400 uppercase tracking-widest">
             © 2026 Storm Creek. Built with precision.
         </div>
     </footer>
 
-    <div id="productModal" class="fixed inset-0 z-[600] modal-bg flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-sm shadow-2xl relative flex flex-col md:flex-row">
-            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-3xl z-10 hover:text-red-600">&times;</button>
-            <div class="w-full md:w-1/2 bg-gray-50">
+    <div id="productModal" class="fixed inset-0 z-[600] modal-bg flex items-center justify-center p-0 md:p-4">
+        <div class="bg-white w-full h-full md:h-auto md:max-w-4xl md:max-h-[90vh] overflow-y-auto relative flex flex-col md:flex-row">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-3xl z-10 hover:text-red-600 bg-white/80 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">&times;</button>
+            <div class="w-full md:w-1/2 bg-gray-100 h-2/3 md:h-auto">
                 <img id="modal-img" src="" class="w-full h-full object-cover">
             </div>
-            <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-                <p id="modal-cat" class="text-xs font-bold text-red-600 uppercase tracking-widest mb-2"></p>
-                <h2 id="modal-name" class="text-3xl font-black tracking-tighter uppercase mb-4"></h2>
-                <p id="modal-price" class="text-2xl font-black mb-6"></p>
-                <p class="text-gray-500 text-sm leading-relaxed mb-8">
-                    Engineered for high-performance use. This item features premium materials and the iconic Storm Creek aesthetic. Built to last through any expedition.
-                </p>
+            <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center bg-white">
+                <p id="modal-cat" class="text-[10px] font-bold text-red-600 uppercase tracking-widest mb-2"></p>
+                <h2 id="modal-name" class="text-2xl md:text-3xl font-black tracking-tighter uppercase mb-4"></h2>
+                <p id="modal-price" class="text-xl md:text-2xl font-black mb-6 text-gray-900"></p>
                 <div class="flex items-center gap-4 mb-8">
-                    <span class="text-xs font-bold uppercase tracking-widest">Quantity</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest">Qty</span>
                     <div class="flex border border-gray-200">
                         <button onclick="updateModalQty(-1)" class="px-4 py-2 hover:bg-gray-100">-</button>
-                        <input type="number" id="modal-qty" value="1" min="1" class="w-12 text-center border-x border-gray-200 focus:outline-none">
+                        <input type="number" id="modal-qty" value="1" min="1" class="w-12 text-center border-x border-gray-200 focus:outline-none text-sm">
                         <button onclick="updateModalQty(1)" class="px-4 py-2 hover:bg-gray-100">+</button>
                     </div>
                 </div>
-                <button id="modal-add-btn" class="w-full bg-black text-white py-5 font-bold uppercase tracking-widest hover:bg-red-600 transition shadow-xl">
+                <button id="modal-add-btn" class="w-full bg-black text-white py-4 md:py-5 font-bold uppercase tracking-widest hover:bg-red-600 transition shadow-xl">
                     Add to Bag
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="authModal" class="fixed inset-0 z-[500] modal-bg flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md p-8 rounded-sm shadow-2xl relative">
-            <button onclick="toggleAuthModal(false)" class="absolute top-4 right-4 text-2xl hover:text-red-600">&times;</button>
-            <h2 class="text-2xl font-black tracking-tighter uppercase mb-2">Join the Creek</h2>
-            <form onsubmit="event.preventDefault(); alert('Welcome to Storm Creek!'); toggleAuthModal(false);" class="space-y-4">
-                <input type="text" placeholder="Full Name" required class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-red-600">
-                <input type="email" placeholder="Email Address" required class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-red-600">
-                <input type="password" placeholder="Password" required class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-red-600">
-                <button type="submit" class="w-full bg-black text-white py-4 font-bold uppercase tracking-widest hover:bg-red-600 transition">Create Account</button>
-            </form>
-        </div>
-    </div>
-
     <div id="cartSidebar" class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-[200] cart-sidebar transform translate-x-full border-l border-gray-100 flex flex-col">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h2 class="text-lg font-black tracking-widest uppercase">Your Cart</h2>
+            <h2 class="text-sm font-black tracking-widest uppercase">Shopping Bag</h2>
             <button onclick="toggleCart(false)" class="text-2xl hover:text-red-600 transition">&times;</button>
         </div>
         <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6"></div>
         <div class="p-6 bg-gray-50 border-t border-gray-100">
             <div class="flex justify-between items-center mb-6">
-                <span class="font-bold text-gray-500 uppercase text-xs tracking-widest">Estimated Total</span>
+                <span class="font-bold text-gray-400 uppercase text-[10px] tracking-widest">Total</span>
                 <span id="cart-total" class="text-xl font-black">$0.00</span>
             </div>
-            <button onclick="alert('Proceeding to Secure Checkout...')" class="w-full bg-black text-white py-5 font-bold uppercase tracking-widest hover:bg-red-600 transition shadow-xl">Process Checkout</button>
+            <button class="w-full bg-black text-white py-5 font-bold uppercase tracking-widest hover:bg-red-600 transition">Checkout</button>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-10 right-10 bg-black text-white px-8 py-4 rounded shadow-2xl transform translate-y-32 transition-transform duration-500 z-[300] font-bold text-xs uppercase tracking-widest flex items-center gap-3">
-        <i class="fa-solid fa-circle-check text-green-500"></i> Added to your bag
+    <div id="toast" class="fixed bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 md:left-auto md:right-10 md:translate-x-0 bg-black text-white px-8 py-4 rounded shadow-2xl transform translate-y-32 transition-transform duration-500 z-[700] font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">
+        <i class="fa-solid fa-circle-check text-green-500 mr-2"></i> Added to bag
+    </div>
+
+    <div id="authModal" class="fixed inset-0 z-[500] modal-bg flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md p-8 rounded-sm shadow-2xl relative">
+            <button onclick="toggleAuthModal(false)" class="absolute top-4 right-4 text-2xl hover:text-red-600">&times;</button>
+            <h2 class="text-xl font-black tracking-tighter uppercase mb-6">Account Login</h2>
+            <form onsubmit="event.preventDefault(); toggleAuthModal(false);" class="space-y-4">
+                <input type="email" placeholder="Email" required class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-red-600">
+                <input type="password" placeholder="Password" required class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-red-600">
+                <button type="submit" class="w-full bg-black text-white py-4 font-bold uppercase tracking-widest hover:bg-red-600 transition">Sign In</button>
+            </form>
+        </div>
     </div>
 
     <script>
+        // Data same as original
         const products = [
             { name: "Pro Studio Audio", price: 299.00, cat: "Electronics", badge: "Best Seller", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" },
             { name: "Nordic Lounge Chair", price: 550.00, cat: "Furniture", badge: "Limited", img: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=500" },
@@ -231,61 +249,50 @@
 
         let cart = [];
 
-        // RENDER GRID
         function renderProducts(items, title) {
-            const area = document.getElementById('main-content-area');
-            area.innerHTML = `
-                <div class="flex justify-between items-end mb-12">
-                    <div>
-                        <h2 id="section-title" class="text-3xl font-black tracking-tighter uppercase">${title}</h2>
-                        <div class="h-1 w-20 bg-red-600 mt-2"></div>
-                    </div>
-                    <button onclick="renderProducts(products, 'All Products')" class="text-sm font-bold border-b-2 border-black pb-1 hover:text-red-600 hover:border-red-600 transition">View All Products</button>
-                </div>
-                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12"></div>
-            `;
             const grid = document.getElementById('product-grid');
+            const titleElem = document.getElementById('section-title');
+            if(titleElem) titleElem.innerText = title;
+            
             grid.innerHTML = items.map(p => `
                 <div class="product-card group cursor-pointer" onclick="openProductModal('${p.name}')">
-                    <div class="relative overflow-hidden bg-gray-50 aspect-[4/5] rounded-sm mb-5">
+                    <div class="relative overflow-hidden bg-gray-50 aspect-[4/5] rounded-sm mb-4 md:mb-5">
                         <img src="${p.img}" class="w-full h-full object-cover">
-                        <span class="absolute top-4 left-4 badge ${p.badge === 'Sale' ? 'bg-red-600 text-white' : 'bg-black text-white'}">${p.badge}</span>
-                        <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform bg-black/5 flex justify-center backdrop-blur-sm">
-                            <span class="text-black font-black uppercase text-[10px] tracking-widest">View Product</span>
-                        </div>
+                        <span class="absolute top-2 left-2 md:top-4 md:left-4 badge ${p.badge === 'Sale' ? 'bg-red-600 text-white' : 'bg-black text-white'}">${p.badge}</span>
                     </div>
-                    <div class="text-center">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">${p.cat}</p>
-                        <h3 class="font-bold text-sm uppercase tracking-tight mb-2">${p.name}</h3>
-                        <p class="font-black text-red-600">$${p.price.toFixed(2)}</p>
+                    <div class="text-center md:text-left">
+                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1">${p.cat}</p>
+                        <h3 class="font-bold text-[12px] md:text-sm uppercase tracking-tight mb-1 md:mb-2 line-clamp-1">${p.name}</h3>
+                        <p class="font-black text-red-600 text-sm md:text-base">$${p.price.toFixed(2)}</p>
                     </div>
                 </div>
             `).join('');
-            area.scrollIntoView({behavior: "smooth"});
         }
 
-        // PRODUCT MODAL LOGIC
+        // Functions for Modals and UI
+        function toggleMobileMenu(open) {
+            document.getElementById('mobileMenu').classList.toggle('sidebar-open', open);
+        }
+
         function openProductModal(name) {
             const product = products.find(p => p.name === name);
             if(!product) return;
-
             document.getElementById('modal-img').src = product.img;
             document.getElementById('modal-name').innerText = product.name;
             document.getElementById('modal-cat').innerText = product.cat;
             document.getElementById('modal-price').innerText = `$${product.price.toFixed(2)}`;
             document.getElementById('modal-qty').value = 1;
-
             document.getElementById('modal-add-btn').onclick = () => {
-                const qty = parseInt(document.getElementById('modal-qty').value);
-                addToCart(product.name, product.price, product.img, qty);
+                addToCart(product.name, product.price, product.img, parseInt(document.getElementById('modal-qty').value));
                 closeProductModal();
             };
-
-            document.getElementById('productModal').style.display = 'flex';
+            document.getElementById('productModal').classList.add('modal-active');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeProductModal() {
-            document.getElementById('productModal').style.display = 'none';
+            document.getElementById('productModal').classList.remove('modal-active');
+            document.body.style.overflow = 'auto';
         }
 
         function updateModalQty(val) {
@@ -294,14 +301,9 @@
             if(current + val >= 1) input.value = current + val;
         }
 
-        // CART SYSTEM
         function addToCart(name, price, img, qty = 1) {
             const existing = cart.find(item => item.name === name);
-            if(existing) {
-                existing.qty += qty;
-            } else {
-                cart.push({ name, price, img, qty });
-            }
+            if(existing) { existing.qty += qty; } else { cart.push({ name, price, img, qty }); }
             updateCartUI();
             showToast();
         }
@@ -310,7 +312,6 @@
             const container = document.getElementById('cart-items');
             const totalLabel = document.getElementById('cart-total');
             const countLabel = document.getElementById('cart-count');
-            
             let total = 0;
             let itemCount = 0;
 
@@ -319,17 +320,16 @@
                 itemCount += item.qty;
                 return `
                     <div class="flex gap-4 items-center">
-                        <img src="${item.img}" class="w-20 h-24 object-cover rounded-sm">
+                        <img src="${item.img}" class="w-16 h-20 object-cover rounded-sm">
                         <div class="flex-1">
-                            <h4 class="text-xs font-black uppercase tracking-tight">${item.name}</h4>
-                            <p class="text-xs text-gray-500 mt-1">Quantity: ${item.qty}</p>
-                            <p class="text-sm font-black text-red-600 mt-1">$${(item.price * item.qty).toFixed(2)}</p>
-                            <button onclick="removeItem(${idx})" class="text-[10px] text-gray-400 underline uppercase font-bold mt-2 hover:text-black">Remove</button>
+                            <h4 class="text-[10px] font-black uppercase tracking-tight">${item.name}</h4>
+                            <p class="text-[10px] text-gray-500">Qty: ${item.qty}</p>
+                            <p class="text-xs font-black text-red-600">$${(item.price * item.qty).toFixed(2)}</p>
+                            <button onclick="removeItem(${idx})" class="text-[9px] text-gray-400 underline uppercase font-bold">Remove</button>
                         </div>
                     </div>
                 `;
             }).join('');
-
             countLabel.innerText = itemCount;
             totalLabel.innerText = `$${total.toFixed(2)}`;
         }
@@ -339,49 +339,40 @@
             updateCartUI();
         }
 
-        // NAVIGATION & UI
         function filterByCat(category) {
             renderProducts(products.filter(p => p.cat === category), category);
+            document.getElementById('main-content-area').scrollIntoView({behavior: "smooth"});
         }
 
         function filterByBadge(badge) {
             renderProducts(products.filter(p => p.badge === badge), badge);
-        }
-
-        function handleSearch() {
-            const query = document.getElementById('productSearch').value.toLowerCase();
-            renderProducts(products.filter(p => p.name.toLowerCase().includes(query)), `Search: ${query}`);
+            document.getElementById('main-content-area').scrollIntoView({behavior: "smooth"});
         }
 
         function toggleCart(open) {
-            document.getElementById('cartSidebar').classList.toggle('cart-open', open);
+            document.getElementById('cartSidebar').classList.toggle('sidebar-open', open);
         }
 
         function toggleAuthModal(show) {
-            document.getElementById('authModal').style.display = show ? 'flex' : 'none';
+            const modal = document.getElementById('authModal');
+            show ? modal.classList.add('modal-active') : modal.classList.remove('modal-active');
         }
 
         function showToast() {
             const toast = document.getElementById('toast');
-            toast.style.transform = "translateY(0)";
-            setTimeout(() => toast.style.transform = "translateY(150px)", 3000);
+            toast.style.transform = "translateY(0) translateX(-50%)";
+            if(window.innerWidth > 768) toast.style.transform = "translateY(0)";
+            setTimeout(() => {
+                toast.style.transform = "translateY(150px) translateX(-50%)";
+                if(window.innerWidth > 768) toast.style.transform = "translateY(150px)";
+            }, 3000);
         }
 
-        function showInfoPage(type) {
-            const area = document.getElementById('main-content-area');
-            let content = '';
-            if(type === 'shipping') {
-                content = `<h2 class="text-4xl font-black mb-8 uppercase">Shipping Policy</h2><p class="text-gray-600">Free worldwide shipping on orders over $150.</p>`;
-            } else if(type === 'contact') {
-                content = `<h2 class="text-4xl font-black mb-8 uppercase">Contact Us</h2><p class="text-gray-600">Email: support@stormcreek.com</p>`;
-            } else if(type === 'returns') {
-                content = `<h2 class="text-4xl font-black mb-8 uppercase">Returns</h2><p class="text-gray-600">30-day return policy on all items.</p>`;
-            }
-            area.innerHTML = content;
-            area.scrollIntoView({behavior: "smooth"});
+        function handleSearch() {
+            const query = document.getElementById('productSearch').value.toLowerCase();
+            renderProducts(products.filter(p => p.name.toLowerCase().includes(query)), "Search Results");
         }
 
-        // Init
         renderProducts(products, "Featured Products");
     </script>
 </body>
